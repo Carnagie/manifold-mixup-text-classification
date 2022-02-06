@@ -10,8 +10,8 @@ api = tweepy.API(auth)
 
 
 def get_tweet_text(tweet_id: int) -> str:
-    time.sleep(0.5)
-    print(f"getting tweet text for tweet: {tweet_id}")
+    time.sleep(3)
+    print(f"[GETTING TWEET ID]: {tweet_id}")
     tweet = api.get_status(tweet_id, tweet_mode="extended")
     return tweet.full_text
 
