@@ -15,7 +15,7 @@ class BertClassifier(nn.Module):
 
         self.bert = BertModel.from_pretrained('bert-base-cased')
         self.dropout = nn.Dropout(dropout)
-        self.linear = nn.Linear(768, 5)
+        self.linear = nn.Linear(768, 10)
         self.relu = nn.ReLU()
 
     def forward(self, input_id, mask):

@@ -5,10 +5,13 @@ from bert_classifier import BertClassifier
 from evaluate import Evaluate
 from train import Train
 
-data_path = 'demo_train.tsv'
-df = pd.read_csv(data_path, sep='\t', dtype={'tweet_id': object})
+# data_path = 'demo_train.tsv'
+data_path = 'covid19_disinfo_english_multiclass_train_included_tweets.csv'
+# df = pd.read_csv(data_path, sep='\t', dtype={'tweet_id': object})
+df = pd.read_csv(data_path, dtype={'tweet_id': object})
 df.head()
-df = df[['tweet_id', 'q7_label']]
+# df = df[['tweet_id', 'q7_label']]
+df = df[['tweet_content', 'q7_label']]
 
 # split data 80:10:10
 np.random.seed(112)

@@ -8,27 +8,31 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 
 # match it with the labels in q7_label from data
 labels = {
-    'no': 0,
-    'yes': 1,
+    'no_not_interesting': 0,
+    'yes_classified_as_in_question_6': 1,
+    'yes_calls_for_action': 2,
+    'yes_blame_authorities': 3,
+    'yes_discusses_cure': 4,
+    'yes_asks_question': 5,
+    'yes_contains_advice': 6,
+    'yes_discusses_action_taken': 7,
+    'yes_other': 8,
+    'not_sure': 9,
 }
 
 
 class Dataset(torch.utils.data.Dataset):
 
     def __init__(self, df):
-        """
-        self.labels = [0, 1]
-        self.texts = [tokenizer(get_tweet_text(tweet_id),
-                                padding='max_length', max_length=512, truncation=True,
-                                return_tensors="pt") for tweet_id in df['tweet_id']]
-        """
         self.labels = []
         self.texts = []
         for ind in df.index:
             try:
-                tweet_text = get_tweet_text(df['tweet_id'][ind])
-            except Exception as e:
-                print("[ERROR]", e)
+                # tweet_text = get_tweet_text(df['tweet_id'][ind])
+                tweet_text = df['tweet_content'][ind]
+                if tweet_text == 'unusable tweet found':
+                    raise Exception
+            except Exception:
                 continue
             self.labels.append(labels[df['q7_label'][ind]])
             self.texts.append(
@@ -40,9 +44,6 @@ class Dataset(torch.utils.data.Dataset):
                     return_tensors="pt"
                 )
             )
-            print(f"[ASSIGNED] [{df['tweet_id'][ind]}] [{df['q7_label'][ind]}]\n"
-                  f"[TEXT] {tweet_text}")
-            print("-------------------------------------------------------------")
 
     def classes(self):
         return self.labels
