@@ -2,12 +2,10 @@ import torch
 import numpy as np
 from transformers import BertTokenizer
 
-from twitter_utils import get_tweet_text
-
 tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 
-# match it with the labels in q7_label from data
-labels = {
+# match it with the labels in class_label from data also in evaluate
+LABELS = {
     'no_not_interesting': 0,
     'yes_classified_as_in_question_6': 1,
     'yes_calls_for_action': 2,
@@ -18,32 +16,41 @@ labels = {
     'yes_discusses_action_taken': 7,
     'yes_other': 8,
     'not_sure': 9,
+    'harmful': 10,
 }
+
+INV_LABELS = {v: k for k, v in LABELS.items()}
 
 
 class Dataset(torch.utils.data.Dataset):
 
-    def __init__(self, df):
+    def __init__(self, df, model_name):
         self.labels = []
         self.texts = []
+        self.tweet_ids = []
+        self.raw_texts = []
+        self.topic = 'covid-19'
+        self.model_name = model_name
         for ind in df.index:
             try:
                 # tweet_text = get_tweet_text(df['tweet_id'][ind])
-                tweet_text = df['tweet_content'][ind]
+                tweet_text = df['tweet_text'][ind]
                 if tweet_text == 'unusable tweet found':
                     raise Exception
             except Exception:
                 continue
-            self.labels.append(labels[df['q7_label'][ind]])
+            self.labels.append(LABELS[df['class_label'][ind]])
             self.texts.append(
                 tokenizer(
                     tweet_text,
                     padding='max_length',
-                    max_length=512,
+                    max_length=30,
                     truncation=True,
                     return_tensors="pt"
                 )
             )
+            self.tweet_ids.append(df['tweet_id'][ind])
+            self.raw_texts.append(tweet_text)
 
     def classes(self):
         return self.labels

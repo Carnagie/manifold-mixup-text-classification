@@ -4,7 +4,7 @@ from transformers import BertTokenizer
 from twitter_utils import get_tweet_text
 
 # Load data
-data_path = 'covid19_disinfo_english_binary_train.tsv'
+data_path = 'data/covid19_disinfo_english_binary_train.tsv'
 df = pd.read_csv(data_path, sep='\t', dtype={'tweet_id': object})
 df.head()
 df = df[['tweet_id', 'q7_label']]

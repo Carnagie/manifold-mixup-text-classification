@@ -3,10 +3,13 @@ from torch import nn
 from torch.optim import Adam
 from tqdm import tqdm
 from dataset import Dataset
+from data_augmenters import get_sentence_mix_up_dict_and_label
+from data_augmenters import get_manifold_mix_up_dict_and_label
+from data_augmenters import get_word_mix_up_dict_and_label
 
 
-def Train(model, train_data, val_data, learning_rate, epochs):
-    train, val = Dataset(train_data), Dataset(val_data)
+def Train(model, train_data, val_data, learning_rate, epochs, mix_up_type=None, model_name=None):
+    train, val = Dataset(train_data, model_name), Dataset(val_data, model_name)
 
     train_dataloader = torch.utils.data.DataLoader(train, batch_size=2, shuffle=True)
     val_dataloader = torch.utils.data.DataLoader(val, batch_size=2)
@@ -31,7 +34,16 @@ def Train(model, train_data, val_data, learning_rate, epochs):
             mask = train_input['attention_mask'].to(device)
             input_id = train_input['input_ids'].squeeze(1).to(device)
 
-            output = model(input_id, mask)
+            if mix_up_type == 'word_mixup':
+                mix_up_dict, train_label = get_word_mix_up_dict_and_label(input_id, train_label)
+            elif mix_up_type == 'sentence_mixup':
+                mix_up_dict, train_label = get_sentence_mix_up_dict_and_label(input_id, train_label)
+            elif mix_up_type == 'manifold_mixup':
+                mix_up_dict, train_label = get_manifold_mix_up_dict_and_label(input_id, train_label)
+            else:
+                mix_up_dict = None
+
+            output = model(input_id, mask, mix_up_dict)
 
             batch_loss = criterion(output, train_label)
             total_loss_train += batch_loss.item()
@@ -53,11 +65,17 @@ def Train(model, train_data, val_data, learning_rate, epochs):
                 mask = val_input['attention_mask'].to(device)
                 input_id = val_input['input_ids'].squeeze(1).to(device)
 
-                output = model(input_id, mask)
+                if mix_up_type == 'word_mixup':
+                    mix_up_dict, val_label = get_word_mix_up_dict_and_label(input_id, val_label)
+                elif mix_up_type == 'sentence_mixup':
+                    mix_up_dict, val_label = get_sentence_mix_up_dict_and_label(input_id, val_label)
+                elif mix_up_type == 'manifold_mixup':
+                    mix_up_dict, val_label = get_manifold_mix_up_dict_and_label(input_id, val_label)
+
+                output = model(input_id, mask, mix_up_dict)
 
                 batch_loss = criterion(output, val_label)
                 total_loss_val += batch_loss.item()
-
                 acc = (output.argmax(dim=1) == val_label).sum().item()
                 total_acc_val += acc
 
