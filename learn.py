@@ -14,7 +14,7 @@ change this to following:
     manifold_mixup
     bert
 """
-MIX_UP_TYPE = 'sentence_mixup'
+MIX_UP_TYPE = 'manifold_mixup'
 
 """
 # data_path = 'demo_train.tsv'
@@ -32,15 +32,15 @@ print(df['class_label'].value_counts())
 # df_train, df_val, df_test = np.split(df.sample(frac=1, random_state=42), [int(.8 * len(df)), int(.9 * len(df))])
 """
 
-train_data_path = 'data/CT22_multilang_train.tsv'
+train_data_path = 'data/CT22_english_1D_attentionworthy_train_positives.tsv'
 df_train = pd.read_csv(train_data_path, sep='\t', dtype={'tweet_id': object})
 df_train = df_train[['tweet_id', 'tweet_text', 'class_label']]
 
-val_data_path = 'data/CT22_multilang_dev.tsv'
+val_data_path = 'data/CT22_english_1D_attentionworthy_dev_positives.tsv'
 df_val = pd.read_csv(val_data_path, sep='\t', dtype={'tweet_id': object})
 df_val = df_val[['tweet_id', 'tweet_text', 'class_label']]
 
-test_data_path = 'data/CT22_multilang_dev_test.tsv'
+test_data_path = 'guessed_positive_test_data.tsv'
 df_test = pd.read_csv(test_data_path, sep='\t', dtype={'tweet_id': object})
 df_test = df_test[['tweet_id', 'tweet_text', 'class_label']]
 
@@ -50,7 +50,7 @@ print('val\n', df_val['class_label'].value_counts())
 print('test\n', df_test['class_label'].value_counts())
 
 
-EPOCHS = 1
+EPOCHS = 5
 
 if MIX_UP_TYPE == 'manifold_mixup':
     model = BertClassifierWithMixup()

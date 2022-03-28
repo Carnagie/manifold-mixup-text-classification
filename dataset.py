@@ -1,3 +1,5 @@
+import random
+
 import torch
 import numpy as np
 from transformers import BertTokenizer
@@ -5,21 +7,29 @@ from transformers import BertTokenizer
 tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 
 # match it with the labels in class_label from data also in evaluate
+# reduce no_not_matching for only positive labeling also update vector size in model
 LABELS = {
-    'no_not_interesting': 0,
-    'yes_classified_as_in_question_6': 1,
-    'yes_calls_for_action': 2,
-    'yes_blame_authorities': 3,
-    'yes_discusses_cure': 4,
-    'yes_asks_question': 5,
-    'yes_contains_advice': 6,
-    'yes_discusses_action_taken': 7,
-    'yes_other': 8,
-    'not_sure': 9,
-    'harmful': 10,
+#    'no_not_interesting': 0,
+    'yes_classified_as_in_question_6': 0,
+    'yes_calls_for_action': 1,
+    'yes_blame_authorities': 2,
+    'yes_discusses_cure': 3,
+    'yes_asks_question': 4,
+    'yes_contains_advice': 5,
+    'yes_discusses_action_taken': 6,
+    'yes_other': 7,
+    'not_sure': 8,
+    'harmful': 9,
 }
 
 INV_LABELS = {v: k for k, v in LABELS.items()}
+
+"""
+INV_LABELS = {
+    0: 'no',
+    1: 'yes',
+}
+"""
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -39,7 +49,12 @@ class Dataset(torch.utils.data.Dataset):
                     raise Exception
             except Exception:
                 continue
-            self.labels.append(LABELS[df['class_label'][ind]])
+            # this is for merging from binary guesses
+            if df['class_label'][ind] == 'no_not_interesting':
+                label_to_use = random.randrange(len(LABELS.items()))
+            else:
+                label_to_use = LABELS[df['class_label'][ind]]
+            self.labels.append(label_to_use)
             self.texts.append(
                 tokenizer(
                     tweet_text,

@@ -29,6 +29,8 @@ def Evaluate(model, test_data, model_name=None):
                 output = model(input_id, mask)
 
                 for ind in range(0, len(output.argmax(dim=1))):
+                    print(ind, len(output.argmax(dim=1)))
+                    print([test.topic, test.tweet_ids[current_entry], INV_LABELS[int(output.argmax(dim=1)[ind])], test.model_name])
                     writer.writerow(
                         [test.topic, test.tweet_ids[current_entry], INV_LABELS[int(output.argmax(dim=1)[ind])], test.model_name]
                     )

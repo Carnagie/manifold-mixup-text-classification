@@ -1,0 +1,6 @@
+topic	tweet_id	class_label	run_id
+covid-19	1370400440144265216	harmful	bert-base-case
+covid-19	1370004867142549507	harmful	bert-base-case
+covid-19	1369343664523251720	harmful	bert-base-case
+covid-19	1369064411672047623	harmful	bert-base-case
+covid-19	1241587305644724225	harmful	bert-base-case
